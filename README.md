@@ -1,4 +1,4 @@
-# easify - Task Management APP
+# easify - Task Management Application
 
 A full-stack task management web application built with:
 - Backend: Django REST Framework
