@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Task, TaskComment, TaskActivity
+from .models import Task, TaskComment, TaskActivity, TaskAttachment
 
 class TaskCommentSerializer(serializers.ModelSerializer):
     author_name = serializers.CharField(source='author.username', read_only=True)
@@ -25,3 +25,9 @@ class TaskSerializer(serializers.ModelSerializer):
         model = Task
         fields = '__all__'
         read_only_fields = ['created_by', 'created_at', 'updated_at']
+
+class TaskAttachmentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TaskAttachment
+        fields = ['id', 'task', 'uploaded_by', 'file', 'uploaded_at']
+        read_only_fields = ['uploaded_by', 'uploaded_at']
