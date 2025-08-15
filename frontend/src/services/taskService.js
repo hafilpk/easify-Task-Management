@@ -15,3 +15,16 @@ export async function createTask(token, taskData) {
   });
   return res.data;
 }
+
+export async function updateTask(token, taskId, updatedFields) {
+  const res = await axios.patch(`${API_URL}${taskId}/`, updatedFields, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return res.data;
+}
+
+export async function deleteTask(token, taskId) {
+  await axios.delete(`${API_URL}${taskId}/`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+}
