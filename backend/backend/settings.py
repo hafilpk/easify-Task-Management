@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'core',
     'workspace',
+    'task',
     'rest_framework',
     'corsheaders',
     'django_filters',
