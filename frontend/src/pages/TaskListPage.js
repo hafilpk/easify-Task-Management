@@ -6,6 +6,8 @@ export default function TaskListPage() {
   const { token } = useContext(AuthContext);
   const [tasks, setTasks] = useState([]);
   const [newTaskTitle, setNewTaskTitle] = useState("");
+  const [filterStatus, setFilterStatus] = useState("all");
+  const [sortOption, setSortOption] = useState("due_date");
 
   useEffect(() => {
     async function fetchTasks() {
@@ -48,6 +50,22 @@ export default function TaskListPage() {
       console.error("Failed to delete task:", err);
     }
   }
+  const filteredTasks =
+    filterStatus === "all"
+      ? tasks
+      : tasks.filter((task) => task.status === filterStatus);
+
+  const sortedTasks = [...filteredTasks].sort((a, b) => {
+    if (sortOption === "due_date") {
+      return new Date(a.due_date) - new Date(b.due_date);
+    } else if (sortOption === "priority") {
+      const priorityOrder = { high: 1, medium: 2, low: 3 };
+      return (priorityOrder[a.priority] || 4) - (priorityOrder[b.priority] || 4);
+    } else if (sortOption === "title") {
+      return a.title.localeCompare(b.title);
+    }
+    return 0;
+  });    
 
   return (
     <div>
@@ -64,9 +82,31 @@ export default function TaskListPage() {
         <button type="submit">Add Task</button>
       </form>
 
+      {/* Filter + Sort Controls */}
+      <div style={{ marginBottom: "20px" }}>
+        <label>
+          Filter by Status:{" "}
+          <select value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)}>
+            <option value="all">All</option>
+            <option value="todo">To Do</option>
+            <option value="in_progress">In Progress</option>
+            <option value="done">Done</option>
+          </select>
+        </label>
+
+        <label style={{ marginLeft: "20px" }}>
+          Sort by:{" "}
+          <select value={sortOption} onChange={(e) => setSortOption(e.target.value)}>
+            <option value="due_date">Due Date</option>
+            <option value="priority">Priority</option>
+            <option value="title">Title</option>
+          </select>
+        </label>
+      </div>
+
       {/* Task List */}
       <ul>
-        {tasks.map((task) => (
+        {sortedTasks.map((task) => (
           <li key={task.id}>
             <strong>{task.title}</strong>
             {" — "}
@@ -79,7 +119,7 @@ export default function TaskListPage() {
               <option value="done">Done</option>
             </select>
             {" "}
-            (Due: {task.due_date || "N/A"})
+            (Priority: {task.priority || "N/A"} — Due: {task.due_date || "N/A"})
             {" "}
             <button onClick={() => handleDelete(task.id)}>❌</button>
           </li>
