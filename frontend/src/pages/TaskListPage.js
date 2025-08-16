@@ -9,6 +9,7 @@ export default function TaskListPage() {
   const [newTaskTitle, setNewTaskTitle] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
   const [sortOption, setSortOption] = useState("due_date");
+  const [searchQuery, setSearchQuery] = useState(""); // 🔍 NEW state
 
   useEffect(() => {
     async function fetchTasks() {
@@ -52,12 +53,20 @@ export default function TaskListPage() {
     }
   }
 
+  // 🔍 Filter by status
   const filteredTasks =
     filterStatus === "all"
       ? tasks
       : tasks.filter((task) => task.status === filterStatus);
 
-  const sortedTasks = [...filteredTasks].sort((a, b) => {
+  // 🔍 Apply search filter (title + description)
+  const searchedTasks = filteredTasks.filter((task) =>
+    (task.title && task.title.toLowerCase().includes(searchQuery.toLowerCase())) ||
+    (task.description && task.description.toLowerCase().includes(searchQuery.toLowerCase()))
+  );
+
+  // 🔍 Sorting logic
+  const sortedTasks = [...searchedTasks].sort((a, b) => {
     if (sortOption === "due_date") {
       return new Date(a.due_date) - new Date(b.due_date);
     } else if (sortOption === "priority") {
@@ -84,7 +93,7 @@ export default function TaskListPage() {
         <button type="submit">Add Task</button>
       </form>
 
-      {/* Filter + Sort Controls */}
+      {/* Filter + Sort + Search Controls */}
       <div style={{ marginBottom: "20px" }}>
         <label>
           Filter by Status:{" "}
@@ -104,6 +113,15 @@ export default function TaskListPage() {
             <option value="title">Title</option>
           </select>
         </label>
+
+        {/* 🔍 Search Bar */}
+        <input
+          type="text"
+          placeholder="Search tasks..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          style={{ marginLeft: "20px" }}
+        />
       </div>
 
       {/* Task List */}
