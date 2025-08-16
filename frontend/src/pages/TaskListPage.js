@@ -1,6 +1,7 @@
 import { useEffect, useState, useContext } from "react";
 import { getTasks, createTask, updateTask, deleteTask } from "../services/taskService";
 import { AuthContext } from "../context/AuthContext";
+import { Link } from "react-router-dom";
 
 export default function TaskListPage() {
   const { token } = useContext(AuthContext);
@@ -50,6 +51,7 @@ export default function TaskListPage() {
       console.error("Failed to delete task:", err);
     }
   }
+
   const filteredTasks =
     filterStatus === "all"
       ? tasks
@@ -65,7 +67,7 @@ export default function TaskListPage() {
       return a.title.localeCompare(b.title);
     }
     return 0;
-  });    
+  });
 
   return (
     <div>
@@ -108,7 +110,10 @@ export default function TaskListPage() {
       <ul>
         {sortedTasks.map((task) => (
           <li key={task.id}>
-            <strong>{task.title}</strong>
+            {/* 🔗 Link around the task title */}
+            <Link to={`/tasks/${task.id}`}>
+              <strong>{task.title}</strong>
+            </Link>
             {" — "}
             <select
               value={task.status}

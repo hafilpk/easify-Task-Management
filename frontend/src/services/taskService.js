@@ -28,3 +28,10 @@ export async function deleteTask(token, taskId) {
     headers: { Authorization: `Bearer ${token}` },
   });
 }
+
+export async function getTaskById(token, id) {
+  const res = await axios.get(`${API_URL}${id}/`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return res.data;
+}
