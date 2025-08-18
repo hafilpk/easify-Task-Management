@@ -1,13 +1,17 @@
 import { useEffect, useState, useContext } from "react";
 import { useParams, Link } from "react-router-dom";
 import { getTaskById, updateTask, deleteTask } from "../services/taskService";
+import { getComments, addComment, deleteComment } from "../services/taskService";
 import { AuthContext } from "../context/AuthContext";
 
 export default function TaskDetailPage() {
   const { id } = useParams();
   const { token } = useContext(AuthContext);
   const [task, setTask] = useState(null);
+  const [comments, setComments] = useState([]);
+  const [newComment, setNewComment] = useState("");
 
+  // fetch task
   useEffect(() => {
     async function fetchTask() {
       try {
@@ -18,6 +22,19 @@ export default function TaskDetailPage() {
       }
     }
     if (token) fetchTask();
+  }, [token, id]);
+
+  // fetch comments
+  useEffect(() => {
+    async function fetchComments() {
+      try {
+        const data = await getComments(token, id);
+        setComments(data);
+      } catch (err) {
+        console.error("Error fetching comments:", err);
+      }
+    }
+    if (token) fetchComments();
   }, [token, id]);
 
   async function handleStatusChange(e) {
@@ -35,6 +52,27 @@ export default function TaskDetailPage() {
       window.location.href = "/tasks";
     } catch (err) {
       console.error("Error deleting task:", err);
+    }
+  }
+
+  async function handleAddComment(e) {
+    e.preventDefault();
+    if (!newComment.trim()) return;
+    try {
+      const comment = await addComment(token, id, newComment);
+      setComments([...comments, comment]);
+      setNewComment("");
+    } catch (err) {
+      console.error("Error adding comment:", err);
+    }
+  }
+
+  async function handleDeleteComment(commentId) {
+    try {
+      await deleteComment(token, commentId);
+      setComments(comments.filter(c => c.id !== commentId));
+    } catch (err) {
+      console.error("Error deleting comment:", err);
     }
   }
 
@@ -59,6 +97,29 @@ export default function TaskDetailPage() {
 
       <button onClick={handleDelete}>Delete Task</button>
       <br /><br />
+
+      {/* Comments Section */}
+      <h3>Comments</h3>
+      <ul>
+        {comments.map(c => (
+          <li key={c.id}>
+            <strong>{c.user}:</strong> {c.content}
+            <button onClick={() => handleDeleteComment(c.id)}>❌</button>
+          </li>
+        ))}
+      </ul>
+
+      <form onSubmit={handleAddComment}>
+        <input
+          type="text"
+          value={newComment}
+          onChange={(e) => setNewComment(e.target.value)}
+          placeholder="Add a comment..."
+        />
+        <button type="submit">Add</button>
+      </form>
+
+      <br />
       <Link to="/tasks">⬅ Back to Tasks</Link>
     </div>
   );

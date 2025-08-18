@@ -1,5 +1,6 @@
 import axios from "axios";
 
+const COMMENT_API_URL = "http://localhost:8000/api/task-comments/";
 const API_URL = "http://localhost:8000/api/tasks/";
 
 export async function getTasks(token) {
@@ -34,4 +35,26 @@ export async function getTaskById(token, id) {
     headers: { Authorization: `Bearer ${token}` },
   });
   return res.data;
+}
+
+export async function getComments(token, taskId) {
+  const res = await axios.get(`${COMMENT_API_URL}?task_id=${taskId}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return res.data;
+}
+
+export async function addComment(token, taskId, content) {
+  const res = await axios.post(
+    COMMENT_API_URL,
+    { task: taskId, content },
+    { headers: { Authorization: `Bearer ${token}` } }
+  );
+  return res.data;
+}
+
+export async function deleteComment(token, commentId) {
+  await axios.delete(`${COMMENT_API_URL}${commentId}/`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
 }
