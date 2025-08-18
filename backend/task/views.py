@@ -17,8 +17,12 @@ class TaskCommentViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        return TaskComment.objects.filter(task__project__workspace__memberships__user=self.request.user)
-
+        queryset = TaskComment.objects.all()
+        task_id = self.request.query_params.get("task_id")
+        if task_id:
+            queryset = queryset.filter(task_id=task_id)
+        return queryset.order_by("created_at")
+    
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
 
