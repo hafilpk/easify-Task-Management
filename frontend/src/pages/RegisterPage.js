@@ -1,11 +1,13 @@
-import { useState, useContext } from "react";
+import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import API from "../services/api";
-import { AuthContext } from "../context/AuthContext";
 
-export default function LoginPage() {
-  const { login } = useContext(AuthContext);
-  const [form, setForm] = useState({ username: "", password: "" });
+export default function RegisterPage() {
+  const [form, setForm] = useState({
+    username: "",
+    email: "",
+    password: "",
+  });
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
@@ -14,11 +16,10 @@ export default function LoginPage() {
     setError("");
 
     try {
-      const res = await API.post("/auth/jwt/create/", form);
-      login(res.data);
-      navigate("/dashboard"); // ✅ redirect after login
+      await API.post("/auth/users/", form); // ✅ djoser default register endpoint
+      navigate("/login"); // redirect to login after successful registration
     } catch (err) {
-      setError("Invalid username or password");
+      setError("Registration failed. Try again.");
     }
   };
 
@@ -28,7 +29,7 @@ export default function LoginPage() {
         onSubmit={handleSubmit}
         style={{ display: "flex", flexDirection: "column", width: "300px", gap: "15px" }}
       >
-        <h2>Login</h2>
+        <h2>Register</h2>
         {error && <p style={{ color: "red" }}>{error}</p>}
         <input
           type="text"
@@ -37,14 +38,20 @@ export default function LoginPage() {
           onChange={(e) => setForm({ ...form, username: e.target.value })}
         />
         <input
+          type="email"
+          placeholder="Email"
+          value={form.email}
+          onChange={(e) => setForm({ ...form, email: e.target.value })}
+        />
+        <input
           type="password"
           placeholder="Password"
           value={form.password}
           onChange={(e) => setForm({ ...form, password: e.target.value })}
         />
-        <button type="submit">Login</button>
+        <button type="submit">Register</button>
         <p>
-          Don’t have an account? <Link to="/register">Register</Link>
+          Already have an account? <Link to="/login">Login</Link>
         </p>
       </form>
     </div>
