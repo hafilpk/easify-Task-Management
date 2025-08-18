@@ -16,12 +16,13 @@ export default function RegisterPage() {
     setError("");
 
     try {
-      await API.post("/auth/users/", form); // ✅ djoser default register endpoint
-      navigate("/login"); // redirect to login after successful registration
+      await API.post("auth/users/", form); 
+      navigate("/"); 
     } catch (err) {
-      setError("Registration failed. Try again.");
-    }
-  };
+        console.error(err.response?.data);
+        setError("Registration failed. Try again.");
+  }
+    };
 
   return (
     <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh" }}>
@@ -49,9 +50,15 @@ export default function RegisterPage() {
           value={form.password}
           onChange={(e) => setForm({ ...form, password: e.target.value })}
         />
+        <input
+          type="password"
+          placeholder="Confirm Password"
+          value={form.re_password}
+          onChange={(e) => setForm({ ...form, re_password: e.target.value })}
+        />
         <button type="submit">Register</button>
         <p>
-          Already have an account? <Link to="/login">Login</Link>
+          Already have an account? <Link to="/">Login</Link>
         </p>
       </form>
     </div>

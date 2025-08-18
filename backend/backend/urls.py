@@ -26,7 +26,9 @@ urlpatterns = [
     path('api/docs/', SpectacularSwaggerView.as_view(url_name='schema')),
     path('api/core/', include('core.urls')),
     path('api/', include('workspace.urls')),
-    path('api/', include('task.urls')),    
+    path('api/', include('task.urls')),
+    path("api/auth/", include("djoser.urls")),
+    path("api/auth/", include("djoser.urls.jwt")),    
 ]
 
 if settings.DEBUG:

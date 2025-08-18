@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'django_filters',
     'drf_spectacular',
+    'djoser'
 ]
 
 MIDDLEWARE = [
@@ -152,3 +153,14 @@ SIMPLE_JWT = {
     'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
 }
 
+DJOSER = {
+    "USER_CREATE_PASSWORD_RETYPE": True,
+    "USERNAME_CHANGED_EMAIL_CONFIRMATION": False,
+    "PASSWORD_CHANGED_EMAIL_CONFIRMATION": False,
+    "SEND_CONFIRMATION_EMAIL": False,
+    "SERIALIZERS": {
+        "user_create": "core.serializers.UserSerializer",  # your serializer
+        "user": "core.serializers.UserSerializer",
+        "current_user": "core.serializers.UserSerializer",
+    },
+}
