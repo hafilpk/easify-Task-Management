@@ -25,15 +25,13 @@ export default function LoginPage() {
   return (
     <div className="container-fluid d-flex align-items-center justify-content-center vh-100 bg-light">
       <div className="row w-100">
-        {/* Left Section - Hero */}
         <div className="col-md-6 d-flex flex-column justify-content-center text-center p-5">
           <h1 className="display-4 fw-bold">Easify</h1>
           <p className="lead text-muted">
             Organize your tasks. Stay productive. Achieve more.
           </p>
         </div>
-
-        {/* Right Section - Login */}
+        
         <div className="col-md-6 d-flex justify-content-center align-items-center">
           <div className="card shadow p-4" style={{ width: "350px" }}>
             <h3 className="text-center mb-3">Login</h3>
