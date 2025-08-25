@@ -1,7 +1,7 @@
 import { useState, useContext } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import API from "../services/api";
 import { AuthContext } from "../context/AuthContext";
+import API from "../services/api";
 
 export default function LoginPage() {
   const { login } = useContext(AuthContext);
@@ -14,39 +14,64 @@ export default function LoginPage() {
     setError("");
 
     try {
-      const res = await API.post("/auth/jwt/create/", form);
+      const res = await API.post("auth/jwt/create/", form);
       login(res.data);
-      navigate("/dashboard"); // ✅ redirect after login
+      navigate("/dashboard");
     } catch (err) {
-      setError("Invalid username or password");
+      setError("Invalid username or password.");
     }
   };
 
   return (
-    <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh" }}>
-      <form
-        onSubmit={handleSubmit}
-        style={{ display: "flex", flexDirection: "column", width: "300px", gap: "15px" }}
-      >
-        <h2>Login</h2>
-        {error && <p style={{ color: "red" }}>{error}</p>}
-        <input
-          type="text"
-          placeholder="Username"
-          value={form.username}
-          onChange={(e) => setForm({ ...form, username: e.target.value })}
-        />
-        <input
-          type="password"
-          placeholder="Password"
-          value={form.password}
-          onChange={(e) => setForm({ ...form, password: e.target.value })}
-        />
-        <button type="submit">Login</button>
-        <p>
-          Don’t have an account? <Link to="/register">Register</Link>
-        </p>
-      </form>
+    <div className="container-fluid d-flex align-items-center justify-content-center vh-100 bg-light">
+      <div className="row w-100">
+        {/* Left Section - Hero */}
+        <div className="col-md-6 d-flex flex-column justify-content-center text-center p-5">
+          <h1 className="display-4 fw-bold">Easify</h1>
+          <p className="lead text-muted">
+            Organize your tasks. Stay productive. Achieve more.
+          </p>
+        </div>
+
+        {/* Right Section - Login */}
+        <div className="col-md-6 d-flex justify-content-center align-items-center">
+          <div className="card shadow p-4" style={{ width: "350px" }}>
+            <h3 className="text-center mb-3">Login</h3>
+            {error && <p className="text-danger text-center">{error}</p>}
+            <form onSubmit={handleSubmit}>
+              <div className="mb-3">
+                <input
+                  type="text"
+                  className="form-control"
+                  placeholder="Username"
+                  value={form.username}
+                  onChange={(e) => setForm({ ...form, username: e.target.value })}
+                  required
+                />
+              </div>
+              <div className="mb-3">
+                <input
+                  type="password"
+                  className="form-control"
+                  placeholder="Password"
+                  value={form.password}
+                  onChange={(e) => setForm({ ...form, password: e.target.value })}
+                  required
+                />
+              </div>
+              <button type="submit" className="btn btn-primary w-100">
+                Login
+              </button>
+            </form>
+            <p className="mt-3 text-center">
+              Don’t have an account?{" "}
+              <Link to="/register" className="text-decoration-none">
+                Register
+              </Link>
+            </p>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
