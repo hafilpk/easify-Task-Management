@@ -24,6 +24,8 @@ export default function TaskListPage() {
   const { token } = useContext(AuthContext);
   const [tasks, setTasks] = useState([]);
   const [newTaskTitle, setNewTaskTitle] = useState("");
+  const [newTaskPriority, setNewTaskPriority] = useState("medium");
+  const [newTaskDueDate, setNewTaskDueDate] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
   const [sortOption, setSortOption] = useState("due_date");
   const [searchQuery, setSearchQuery] = useState("");
@@ -41,10 +43,17 @@ export default function TaskListPage() {
     if (!newTaskTitle.trim()) return;
 
     try {
-      const taskData = { title: newTaskTitle, status: "todo" };
+      const taskData = {
+        title: newTaskTitle,
+        priority: newTaskPriority,
+        due_date: newTaskDueDate,
+        status: "todo",
+      };
       const createdTask = await createTask(token, taskData);
       setTasks((prev) => [...prev, createdTask]);
       setNewTaskTitle("");
+      setNewTaskPriority("medium");
+      setNewTaskDueDate("");
     } catch (err) {
       console.error("Failed to add task:", err);
     }
@@ -93,122 +102,147 @@ export default function TaskListPage() {
   });
 
   return (
-    <Container maxWidth="md" sx={{ mt: 5,}}>
-      <Typography variant="h4" fontWeight="bold" color="primary" gutterBottom>
-        My Tasks
-      </Typography>
+    <Box sx={{ minHeight: "100vh", backgroundColor: "#c2719aff", py: 5 }}>
+      <Container maxWidth="md">
+        <Typography variant="h4" fontWeight="bold" color="white" gutterBottom>
+          My Tasks
+        </Typography>
 
-      <Box
-        component="form"
-        onSubmit={handleAddTask}
-        sx={{ display: "flex", gap: 2, mb: 3 }}
-      >
-        <TextField
-          label="Enter new task"
-          fullWidth
-          value={newTaskTitle}
-          onChange={(e) => setNewTaskTitle(e.target.value)}
-        />
-        <Button type="submit" variant="contained" startIcon={<AddIcon />}>
-          Add
-        </Button>
-      </Box>
-
-      <Grid container spacing={2} sx={{ mb: 3 }}>
-        <Grid item xs={12} sm={4}>
-          <FormControl fullWidth>
-            <InputLabel>Status</InputLabel>
-            <Select
-              value={filterStatus}
-              label="Status"
-              onChange={(e) => setFilterStatus(e.target.value)}
-            >
-              <MenuItem value="all">All</MenuItem>
-              <MenuItem value="todo">To Do</MenuItem>
-              <MenuItem value="in_progress">In Progress</MenuItem>
-              <MenuItem value="done">Done</MenuItem>
-            </Select>
-          </FormControl>
-        </Grid>
-
-        <Grid item xs={12} sm={4}>
-          <FormControl fullWidth>
-            <InputLabel>Sort by</InputLabel>
-            <Select
-              value={sortOption}
-              label="Sort by"
-              onChange={(e) => setSortOption(e.target.value)}
-            >
-              <MenuItem value="due_date">Due Date</MenuItem>
-              <MenuItem value="priority">Priority</MenuItem>
-              <MenuItem value="title">Title</MenuItem>
-            </Select>
-          </FormControl>
-        </Grid>
-
-        <Grid item xs={12} sm={4}>
+        {/* Add Task Form */}
+        <Box
+          component="form"
+          onSubmit={handleAddTask}
+          sx={{ display: "flex", flexWrap: "wrap", gap: 2, mb: 3 }}
+        >
           <TextField
-            label="Search tasks..."
+            label="Enter new task"
             fullWidth
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            value={newTaskTitle}
+            onChange={(e) => setNewTaskTitle(e.target.value)}
+            sx={{ flex: "2"}}
           />
-        </Grid>
-      </Grid>
+          <FormControl sx={{ minWidth: 120 }}>
+            <InputLabel>Priority</InputLabel>
+            <Select
+              value={newTaskPriority}
+              label="Priority"
+              onChange={(e) => setNewTaskPriority(e.target.value)}
+            >
+              <MenuItem value="high">High</MenuItem>
+              <MenuItem value="medium">Medium</MenuItem>
+              <MenuItem value="low">Low</MenuItem>
+            </Select>
+          </FormControl>
+          <TextField
+            label="Due Date"
+            type="date"
+            value={newTaskDueDate}
+            onChange={(e) => setNewTaskDueDate(e.target.value)}
+            InputLabelProps={{ shrink: true }}
+          />
+          <Button type="submit" variant="contained" startIcon={<AddIcon />}>
+            Add
+          </Button>
+        </Box>
 
-      <Grid container spacing={2}>
-        {sortedTasks.length > 0 ? (
-          sortedTasks.map((task) => (
-            <Grid item xs={12} key={task.id}>
-              <Card
-                sx={{
-                  borderRadius: "12px",
-                  transition: "0.2s",
-                  "&:hover": { boxShadow: 6 },
-                }}
+        {/* Filters */}
+        <Grid container spacing={2} sx={{ mb: 3 }}>
+          <Grid item xs={12} sm={4}>
+            <FormControl fullWidth>
+              <InputLabel>Status</InputLabel>
+              <Select
+                value={filterStatus}
+                label="Status"
+                onChange={(e) => setFilterStatus(e.target.value)}
               >
-                <CardContent
-                  sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}
-                >
-                  <Box>
-                    <Typography variant="h6">
-                      <Link to={`/tasks/${task.id}`} style={{ textDecoration: "none", color: "inherit" }}>
-                        {task.title}
-                      </Link>
-                    </Typography>
-                    <Typography variant="body2" color="textSecondary">
-                      Priority: {task.priority || "N/A"} — Due: {task.due_date || "N/A"}
-                    </Typography>
-                  </Box>
+                <MenuItem value="all">All</MenuItem>
+                <MenuItem value="todo">To Do</MenuItem>
+                <MenuItem value="in_progress">In Progress</MenuItem>
+                <MenuItem value="done">Done</MenuItem>
+              </Select>
+            </FormControl>
+          </Grid>
 
-                  <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-                    <FormControl size="small">
-                      <Select
-                        value={task.status}
-                        onChange={(e) => handleStatusChange(task.id, e.target.value)}
+          <Grid item xs={12} sm={4}>
+            <FormControl fullWidth>
+              <InputLabel>Sort by</InputLabel>
+              <Select
+                value={sortOption}
+                label="Sort by"
+                onChange={(e) => setSortOption(e.target.value)}
+              >
+                <MenuItem value="due_date">Due Date</MenuItem>
+                <MenuItem value="priority">Priority</MenuItem>
+                <MenuItem value="title">Title</MenuItem>
+              </Select>
+            </FormControl>
+          </Grid>
+
+          <Grid item xs={12} sm={4}>
+            <TextField
+              label="Search tasks..."
+              fullWidth
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </Grid>
+        </Grid>
+
+        {/* Task Cards */}
+        <Grid container spacing={2}>
+          {sortedTasks.length > 0 ? (
+            sortedTasks.map((task) => (
+              <Grid item xs={12} key={task.id}>
+                <Card
+                  sx={{
+                    borderRadius: "12px",
+                    transition: "0.2s",
+                    "&:hover": { boxShadow: 6 },
+                  }}
+                >
+                  <CardContent
+                    sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}
+                  >
+                    <Box>
+                      <Typography variant="h6">
+                        <Link to={`/tasks/${task.id}`} style={{ textDecoration: "none", color: "inherit" }}>
+                          {task.title}
+                        </Link>
+                      </Typography>
+                      <Typography variant="body2" color="textSecondary">
+                        Priority: {task.priority || "N/A"} — Due: {task.due_date || "N/A"}
+                      </Typography>
+                    </Box>
+
+                    <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+                      <FormControl size="small">
+                        <Select
+                          value={task.status}
+                          onChange={(e) => handleStatusChange(task.id, e.target.value)}
+                        >
+                          <MenuItem value="todo">To Do</MenuItem>
+                          <MenuItem value="in_progress">In Progress</MenuItem>
+                          <MenuItem value="done">Done</MenuItem>
+                        </Select>
+                      </FormControl>
+                      <IconButton
+                        color="error"
+                        onClick={() => handleDelete(task.id)}
                       >
-                        <MenuItem value="todo">To Do</MenuItem>
-                        <MenuItem value="in_progress">In Progress</MenuItem>
-                        <MenuItem value="done">Done</MenuItem>
-                      </Select>
-                    </FormControl>
-                    <IconButton
-                      color="error"
-                      onClick={() => handleDelete(task.id)}
-                    >
-                      <DeleteIcon />
-                    </IconButton>
-                  </Box>
-                </CardContent>
-              </Card>
-            </Grid>
-          ))
-        ) : (
-          <Typography variant="body1" color="textSecondary" sx={{ mt: 2, mx: "auto" }}>
-            No tasks found.
-          </Typography>
-        )}
-      </Grid>
-    </Container>
+                        <DeleteIcon />
+                      </IconButton>
+                    </Box>
+                  </CardContent>
+                </Card>
+              </Grid>
+            ))
+          ) : (
+            <Typography variant="body1" color="white" sx={{ mt: 2, textAlign: "center" }}>
+              No tasks found.
+            </Typography>
+          )}
+        </Grid>
+      </Container>
+    </Box>
   );
 }
