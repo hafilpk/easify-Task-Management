@@ -2,6 +2,23 @@ import { useEffect, useState, useContext } from "react";
 import { getTasks, createTask, updateTask, deleteTask } from "../services/taskService";
 import { AuthContext } from "../context/AuthContext";
 import { Link } from "react-router-dom";
+import {
+  Container,
+  Typography,
+  TextField,
+  Button,
+  Select,
+  MenuItem,
+  InputLabel,
+  FormControl,
+  Grid,
+  Card,
+  CardContent,
+  IconButton,
+  Box,
+} from "@mui/material";
+import DeleteIcon from "@mui/icons-material/Delete";
+import AddIcon from "@mui/icons-material/Add";
 
 export default function TaskListPage() {
   const { token } = useContext(AuthContext);
@@ -9,7 +26,7 @@ export default function TaskListPage() {
   const [newTaskTitle, setNewTaskTitle] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
   const [sortOption, setSortOption] = useState("due_date");
-  const [searchQuery, setSearchQuery] = useState(""); // 🔍 NEW state
+  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     async function fetchTasks() {
@@ -53,19 +70,16 @@ export default function TaskListPage() {
     }
   }
 
-  // 🔍 Filter by status
   const filteredTasks =
     filterStatus === "all"
       ? tasks
       : tasks.filter((task) => task.status === filterStatus);
 
-  // 🔍 Apply search filter (title + description)
   const searchedTasks = filteredTasks.filter((task) =>
     (task.title && task.title.toLowerCase().includes(searchQuery.toLowerCase())) ||
     (task.description && task.description.toLowerCase().includes(searchQuery.toLowerCase()))
   );
 
-  // 🔍 Sorting logic
   const sortedTasks = [...searchedTasks].sort((a, b) => {
     if (sortOption === "due_date") {
       return new Date(a.due_date) - new Date(b.due_date);
@@ -79,75 +93,122 @@ export default function TaskListPage() {
   });
 
   return (
-    <div>
-      <h2>My Tasks</h2>
+    <Container maxWidth="md" sx={{ mt: 5,}}>
+      <Typography variant="h4" fontWeight="bold" color="primary" gutterBottom>
+        My Tasks
+      </Typography>
 
-      {/* Add Task Form */}
-      <form onSubmit={handleAddTask} style={{ marginBottom: "20px" }}>
-        <input
-          type="text"
-          placeholder="Enter new task..."
+      <Box
+        component="form"
+        onSubmit={handleAddTask}
+        sx={{ display: "flex", gap: 2, mb: 3 }}
+      >
+        <TextField
+          label="Enter new task"
+          fullWidth
           value={newTaskTitle}
           onChange={(e) => setNewTaskTitle(e.target.value)}
         />
-        <button type="submit">Add Task</button>
-      </form>
+        <Button type="submit" variant="contained" startIcon={<AddIcon />}>
+          Add
+        </Button>
+      </Box>
 
-      {/* Filter + Sort + Search Controls */}
-      <div style={{ marginBottom: "20px" }}>
-        <label>
-          Filter by Status:{" "}
-          <select value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)}>
-            <option value="all">All</option>
-            <option value="todo">To Do</option>
-            <option value="in_progress">In Progress</option>
-            <option value="done">Done</option>
-          </select>
-        </label>
-
-        <label style={{ marginLeft: "20px" }}>
-          Sort by:{" "}
-          <select value={sortOption} onChange={(e) => setSortOption(e.target.value)}>
-            <option value="due_date">Due Date</option>
-            <option value="priority">Priority</option>
-            <option value="title">Title</option>
-          </select>
-        </label>
-
-        {/* 🔍 Search Bar */}
-        <input
-          type="text"
-          placeholder="Search tasks..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          style={{ marginLeft: "20px" }}
-        />
-      </div>
-
-      {/* Task List */}
-      <ul>
-        {sortedTasks.map((task) => (
-          <li key={task.id}>
-            {/* 🔗 Link around the task title */}
-            <Link to={`/tasks/${task.id}`}>
-              <strong>{task.title}</strong>
-            </Link>
-            {" — "}
-            <select
-              value={task.status}
-              onChange={(e) => handleStatusChange(task.id, e.target.value)}
+      <Grid container spacing={2} sx={{ mb: 3 }}>
+        <Grid item xs={12} sm={4}>
+          <FormControl fullWidth>
+            <InputLabel>Status</InputLabel>
+            <Select
+              value={filterStatus}
+              label="Status"
+              onChange={(e) => setFilterStatus(e.target.value)}
             >
-              <option value="todo">To Do</option>
-              <option value="in_progress">In Progress</option>
-              <option value="done">Done</option>
-            </select>
-            {" "}
-            (Priority: {task.priority || "N/A"} — Due: {task.due_date || "N/A"})
-            {" "}
-            <button onClick={() => handleDelete(task.id)}>❌</button>
-          </li>
-        ))}
-      </ul>
-    </div>
+              <MenuItem value="all">All</MenuItem>
+              <MenuItem value="todo">To Do</MenuItem>
+              <MenuItem value="in_progress">In Progress</MenuItem>
+              <MenuItem value="done">Done</MenuItem>
+            </Select>
+          </FormControl>
+        </Grid>
+
+        <Grid item xs={12} sm={4}>
+          <FormControl fullWidth>
+            <InputLabel>Sort by</InputLabel>
+            <Select
+              value={sortOption}
+              label="Sort by"
+              onChange={(e) => setSortOption(e.target.value)}
+            >
+              <MenuItem value="due_date">Due Date</MenuItem>
+              <MenuItem value="priority">Priority</MenuItem>
+              <MenuItem value="title">Title</MenuItem>
+            </Select>
+          </FormControl>
+        </Grid>
+
+        <Grid item xs={12} sm={4}>
+          <TextField
+            label="Search tasks..."
+            fullWidth
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+        </Grid>
+      </Grid>
+
+      <Grid container spacing={2}>
+        {sortedTasks.length > 0 ? (
+          sortedTasks.map((task) => (
+            <Grid item xs={12} key={task.id}>
+              <Card
+                sx={{
+                  borderRadius: "12px",
+                  transition: "0.2s",
+                  "&:hover": { boxShadow: 6 },
+                }}
+              >
+                <CardContent
+                  sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}
+                >
+                  <Box>
+                    <Typography variant="h6">
+                      <Link to={`/tasks/${task.id}`} style={{ textDecoration: "none", color: "inherit" }}>
+                        {task.title}
+                      </Link>
+                    </Typography>
+                    <Typography variant="body2" color="textSecondary">
+                      Priority: {task.priority || "N/A"} — Due: {task.due_date || "N/A"}
+                    </Typography>
+                  </Box>
+
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+                    <FormControl size="small">
+                      <Select
+                        value={task.status}
+                        onChange={(e) => handleStatusChange(task.id, e.target.value)}
+                      >
+                        <MenuItem value="todo">To Do</MenuItem>
+                        <MenuItem value="in_progress">In Progress</MenuItem>
+                        <MenuItem value="done">Done</MenuItem>
+                      </Select>
+                    </FormControl>
+                    <IconButton
+                      color="error"
+                      onClick={() => handleDelete(task.id)}
+                    >
+                      <DeleteIcon />
+                    </IconButton>
+                  </Box>
+                </CardContent>
+              </Card>
+            </Grid>
+          ))
+        ) : (
+          <Typography variant="body1" color="textSecondary" sx={{ mt: 2, mx: "auto" }}>
+            No tasks found.
+          </Typography>
+        )}
+      </Grid>
+    </Container>
   );
 }
